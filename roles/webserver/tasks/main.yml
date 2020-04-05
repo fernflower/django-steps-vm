@@ -1,0 +1,43 @@
+- hosts: "{{ variable_host | default('mysite') }}"
+
+  tasks:
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: latest
+        update_cache: yes
+      become: true
+
+    - name: Start nginx
+      service:
+        name: nginx
+        state: started
+      become: true
+
+    - name: Generate nginx config
+      template:
+        src: files/nginx.j2
+        dest: /etc/nginx/sites-available/mysite
+      become: true
+
+    - name: Remove default nginx site from enabled
+      file:
+        path: "{{item}}"
+        state: absent
+      with_items:
+        - /etc/nginx/sites-enabled/default
+        - /etc/nginx/sites-available/default
+      notify: nginx reload
+      become: true
+
+    - name: Create symlink in sites-enabled
+      file: src=/etc/nginx/sites-available/mysite dest=/etc/nginx/sites-enabled/mysite state=link
+      notify: nginx reload
+      become: true
+
+  handlers:
+    - name: nginx reload
+      service:
+        name: nginx
+        state: restarted
+      become: true

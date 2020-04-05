@@ -1,0 +1,8 @@
+ansible_user: ubuntu
+#fqdn: maxmakagonov.com
+fqdn: ""
+nginx_host: 127.0.0.1
+nginx_port: 8888
+static_url: "max_static"
+# NOTE: affects only launch via run_docker.sh
+docker_image_suffix: "max"

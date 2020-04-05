@@ -1,0 +1,52 @@
+- hosts: "{{ variable_host | default('mysite') }}"
+  vars:
+    branch: max
+    home_dir: /home/ubuntu
+    docker_compose_run: true
+
+  tasks:
+    - name: Update packages
+      apt:
+        update_cache: yes
+      become: true
+
+    - name: Install system packages
+      apt:
+        name: "{{ item }}"
+        state: latest
+      loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools', 'git']
+      become: true
+
+    - name: Update apt and install docker (should do for 18.04)
+      apt:
+        name: "{{item}}"
+        state: latest
+        update_cache: yes
+      loop: ['docker.io', 'docker-compose']
+      become: true
+
+    - name: Clone repo
+      git:
+        repo: https://github.com/fernflower/django_steps
+        dest: "{{home_dir}}/django_steps"
+        version: "{{branch}}"
+        update: no
+
+    - name: Create dummy blog.env
+      template:
+        src: files/blog.env.j2
+        dest: "{{home_dir}}/django_steps/blog.env"
+
+    - name: Launch site with run_docker.sh
+      shell: "bash {{home_dir}}/django_steps/run_docker.sh"
+      args:
+        chdir: "{{home_dir}}/django_steps"
+      become: true
+      when: not docker_compose_run|bool
+
+    - name: Launch site with docker-compose
+      shell: "docker-compose up -d"
+      args:
+        chdir: "{{home_dir}}/django_steps"
+      become: true
+      when: docker_compose_run|bool

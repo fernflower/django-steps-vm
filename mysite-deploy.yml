@@ -1,0 +1,3 @@
+---
+ - import_playbook: roles/webserver/tasks/main.yml
+ - import_playbook: roles/mysite/tasks/main.yml
