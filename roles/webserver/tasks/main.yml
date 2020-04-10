@@ -35,6 +35,22 @@
       notify: nginx reload
       become: true
 
+    - name: Add certbot ppa
+      apt_repository:
+        repo: ppa:certbot/certbot
+      become: true
+
+    - name: Install certbox nginx package
+      apt:
+        name: "python-certbot-nginx"
+        state: latest
+      become: true
+
+    - name: Remind to issue certificates
+      debug:
+        msg: "certbot --nginx -d {{fqdn}} -d www.{{fqdn}}"
+      when: fqdn | length > 0
+
   handlers:
     - name: nginx reload
       service:

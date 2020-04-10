@@ -1,7 +1,7 @@
 - hosts: "{{ variable_host | default('mysite') }}"
   vars:
     branch: max
-    home_dir: /home/ubuntu
+    home_dir: "/home/{{ansible_user}}"
     docker_compose_run: true
 
   tasks:
@@ -32,7 +32,7 @@
         version: "{{branch}}"
         update: no
 
-    - name: Create dummy blog.env
+    - name: Create blog.env from vars.yml
       template:
         src: files/blog.env.j2
         dest: "{{home_dir}}/django_steps/blog.env"
