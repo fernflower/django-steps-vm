@@ -4,5 +4,8 @@ fqdn: ""
 nginx_host: 127.0.0.1
 nginx_port: 8888
 static_url: "max_static"
+# fetchevents specific
+calendar_id: "jh57vhgp98orc9tcfm47osmnic@group.calendar.google.com"
+run_every: 5
 # NOTE: affects only launch via run_docker.sh
 docker_image_suffix: "max"

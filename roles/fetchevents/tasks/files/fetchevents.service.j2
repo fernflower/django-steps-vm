@@ -1,0 +1,13 @@
+[Unit]
+Description=Fetch events from google calendar
+Wants=fetchevents.timer
+
+[Service]
+ExecStart=/bin/bash -c "{{home_dir}}/django_steps/.venv/bin/python {{home_dir}}/django_steps/fetchevents.py \
+                        --id {{calendar_id}} \
+                        --output {{home_dir}}/django_steps/files/events.json"
+WorkingDirectory={{home_dir}}/django_steps
+User={{ansible_user}}
+
+[Install]
+WantedBy=multi-user.target

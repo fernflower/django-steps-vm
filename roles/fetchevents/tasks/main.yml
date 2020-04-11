@@ -1,0 +1,45 @@
+- hosts: "{{ variable_host | default('mysite') }}"
+  vars:
+    home_dir: "/home/{{ansible_user}}"
+    calendar_id: "jh57vhgp98orc9tcfm47osmnic@group.calendar.google.com"
+
+  tasks:
+    - name: Install system packages
+      apt:
+        name: "{{ item }}"
+        state: latest
+      loop: ['python3-pip', 'python3-venv']
+      become: true
+
+    - name: Create .venv
+      shell: "python3 -m venv {{home_dir}}/django_steps/.venv"
+
+    - name: Install deps from requirements-fetcher.txt
+      shell:
+      args:
+        cmd: "{{home_dir}}/django_steps/.venv/bin/pip install -r requirements-fetcher.txt"
+        chdir: "{{home_dir}}/django_steps"
+
+    - name: Remind to provide proper credentials
+      debug:
+        msg: "Don't forget to copy proper credentials for calendar access as files/credentials.json"
+
+    - name: Create systemd service
+      template:
+        src: files/fetchevents.service.j2
+        dest: "/etc/systemd/system/fetchevents.service"
+      become: true
+
+    - name: Create systemd timer
+      template:
+        src: files/fetchevents.timer.j2
+        dest: "/etc/systemd/system/fetchevents.timer"
+      become: true
+
+    - name: Run daemon-reload
+      shell: systemctl daemon-reload
+      become: true
+
+    - name: Remind to start the service
+      debug:
+        msg: "To enable the service on regular basis: systemctl enable fetchevents.service"
