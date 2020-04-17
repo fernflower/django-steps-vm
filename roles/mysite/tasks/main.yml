@@ -37,6 +37,12 @@
         src: files/blog.env.j2
         dest: "{{home_dir}}/django_steps/blog.env"
 
+    - name: If app_secret variable has been set - copy file under django_steps/files/credentails.json
+      copy:
+        src: "{{app_secret}}"
+        dest: "{{home_dir}}/django_steps/files/credentials.json"
+      when: app_secret | length > 0
+
     - name: Launch site with run_docker.sh
       shell: "bash {{home_dir}}/django_steps/run_docker.sh"
       args:
@@ -50,3 +56,7 @@
         chdir: "{{home_dir}}/django_steps"
       become: true
       when: docker_compose_run|bool
+
+    - name: Remind about granting access
+      debug:
+        msg: "python get_token.py --credentials files/credentials.json --token files/token.pickle"

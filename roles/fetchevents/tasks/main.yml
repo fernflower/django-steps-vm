@@ -1,7 +1,7 @@
 - hosts: "{{ variable_host | default('mysite') }}"
   vars:
     home_dir: "/home/{{ansible_user}}"
-    calendar_id: "jh57vhgp98orc9tcfm47osmnic@group.calendar.google.com"
+    calendar_id: "primary"
 
   tasks:
     - name: Install system packages
@@ -22,7 +22,7 @@
 
     - name: Remind to provide proper credentials
       debug:
-        msg: "Don't forget to copy proper credentials for calendar access as files/credentials.json"
+        msg: "Don't forget to copy proper app's credentials.conf as files/credentials.json"
 
     - name: Create systemd service
       template:
